@@ -1,5 +1,7 @@
 import pygame
 from scripts.player import Player
+from scripts.functions import load_image
+from scripts.bullet import Bullet
 
 
 flags = pygame.RESIZABLE | pygame.SCALED
@@ -8,23 +10,31 @@ clock = pygame.time.Clock()
 
 FPS = 60
 
-background = pygame.image.load('images\\background.png')
-background = pygame.transform.scale(background, (800, 600))
-bullet = pygame.image.load('images\\bullet.png')
-enemy_image = pygame.image.load('images\\enemy.png')
-player_image = pygame.image.load('images\\player.png')
-player_image = pygame.transform.scale(player_image, (75, 90))
+
+background = load_image('images\\background.png', (800, 600), None)
+bullet_image = load_image('images\\bullet.png', (50, 40), (255, 255, 255))
+enemy_image = load_image('images\\enemy.png', (90, 90), (0, 0, 0))
+player_image = load_image('images\\player.png', (90, 90), (255,255,255))
 player = Player(400, 550, player_image, 5)
+bullets = list()
 game = True
 
 while game:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                bullets.append(Bullet(player.rect.centerx, player.rect.y, bullet_image, 10))
 
     player.update()
-
+    for bullet in bullets:
+        bullet.update()
+        if bullet.rect.bottom <= 0:
+            bullets.remove(bullet)
     window.blit(background, (0,0))
     player.render(window)
+    for bullet in bullets:
+        bullet.render(window)
     pygame.display.update()
     clock.tick(60)
